@@ -19,7 +19,7 @@ class titleBLOCK:
          
         ##Create Fonts
         self.title = font.Font(family='Arial', size=40, weight='bold') 
-        self.heading = font.Font(family='Arial', size=18, weight='bold')       
+        self.heading = font.Font(family='Arial', size=14, weight='bold')       
 
         self.logo = PhotoImage(file = '3D-ppLogo.gif')
         self.pp=Label(self.tit,image=self.logo,anchor="center").grid() 
@@ -49,7 +49,7 @@ class stepperGUI:
         
         ##Create Fonts
         self.title = font.Font(family='Arial', size=25, weight='bold') 
-        self.heading = font.Font(family='Arial', size=18, weight='bold')
+        self.heading = font.Font(family='Arial', size=14, weight='bold')
         
         ##Title
         self.labelt = Label(self.sm, text=title, padx=4,pady=4, bg=smColor, fg='black',font=self.title)
@@ -110,8 +110,8 @@ class stepperGUI:
         sizes = [
             ("Full",0),
             ("Half",1),
-            ("1/4 - microstep",2),
-            ("1/8 - microstep",3)
+            ("1/4",2),
+            ("1/8",3)
             ] 
         
         for txt, val in sizes:
@@ -154,7 +154,7 @@ class stepperGUI:
 
         ##Off Button
         self.stopButton=Button(self.sm,text="OFF",fg="black",bg="yellow",height=3, width=6,command=self.off)
-        self.stopButton.grid(row=13,column=1) 
+        self.stopButton.grid(row=13,column=2) 
         
         self.stop()   #ensure motor is off at start
         self.off()   #ensure motor is off at start
