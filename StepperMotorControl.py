@@ -255,9 +255,11 @@ MOTOR.RESET(1)
         
 #root = Tk()
 root.config(bg="black")
-root.attributes("-fullscreen", True)
-swidth=root.winfo_screenwidth()
-sheight=root.winfo_screenheight()
+root.attributes("-fullscreen", False)
+root.minsize(width=700, height=700)
+root.title("Stepper Motor Control")
+#swidth= root.winfo_screenwidth() # remove comment for full screen
+#sheight=root.winfo_screenheight() # remove comment for full screen
 #print tkFont.families()
 container=Frame(root,bg="white")
 container.place(relx=0.5, rely=0.5, anchor=CENTER)
@@ -265,10 +267,10 @@ container.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 ma_gui = stepperGUI(container,"Stepper Motor A",'a',1,1)
 mb_gui = stepperGUI(container,"Stepper Motor B",'b',1,2)
-m1_gui = dcGUI(container,"DC Motor 1",1,0,0)
-m2_gui = dcGUI(container,"DC Motor 2",2,2,0)
-m3_gui = dcGUI(container,"DC Motor 3",3,0,3)
-m4_gui = dcGUI(container,"DC Motor 4",4,2,3)
+#m1_gui = dcGUI(container,"DC Motor 1",1,0,0)
+#m2_gui = dcGUI(container,"DC Motor 2",2,2,0)
+#m3_gui = dcGUI(container,"DC Motor 3",3,0,3)
+#m4_gui = dcGUI(container,"DC Motor 4",4,2,3)
 title = titleBLOCK(container,0,1)
 
 
