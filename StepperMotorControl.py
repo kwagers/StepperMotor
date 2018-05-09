@@ -55,6 +55,15 @@ class stepperGUI:
         self.labelt = Label(self.sm, text=title, padx=4,pady=4, bg=smColor, fg='black',font=self.title)
         self.labelt.grid(row=0,column=0,columnspan=2,sticky=W+E)
         
+        ##Interval Rate Control
+        self.labels = Label(self.sm, text="Interval Repeat",padx=4,pady=4,font=self.heading)
+        self.labels.grid(row=1,column=2)
+        self.rate=IntVar()
+        self.rate.set(0)
+        self.RateSet=Scale(self.sm,variable=self.interval,from_=2000,to=0,width=slwidth,length=slength)
+        self.RateSet.bind("<ButtonRelease-1>", self.ratedelta)
+        self.RateSet.grid(row=2,column=2,rowspan=2)
+ 
         ##Step Rate Control
         self.labels = Label(self.sm, text="Step Rate",padx=4,pady=4,font=self.heading)
         self.labels.grid(row=1,column=0)
@@ -82,6 +91,14 @@ class stepperGUI:
         self.acc.set(0.0)
         self.accSet=Scale(self.sm,variable=self.acc,from_=5.0,to=0.0, resolution=0.1,width=slwidth,length=slength)
         self.accSet.grid(row=5,column=0,rowspan=4)
+
+        ##Interval Delay Control
+        self.labela = Label(self.sm, text="Interval Delay",padx=4,pady=4,font=self.heading)
+        self.labela.grid(row=4,column=2)
+        self.delay=DoubleVar()
+        self.delay.set(0.0)
+        self.delaySet=Scale(self.sm,variable=self.delay,from_=10.0,to=0.0, resolution=0.1,width=slwidth,length=slength)
+        self.delaySet.grid(row=5,column=2,rowspan=4)
 
         ##Step Size Control
         rStart = 4     
@@ -111,6 +128,18 @@ class stepperGUI:
         self.StepSet=Scale(self.sm,variable=self.steps,from_=2000,to=0,width=slwidth,length=slength)
         self.StepSet.grid(row=10,column=0,rowspan=3)                
 
+        ##Step Count Control
+        self.labelstep = Label(self.sm, text="Step Count",padx=4,pady=4,font=self.heading)
+        self.labelstep.grid(row=9,column=0)
+        self.steps=IntVar()
+        self.steps.set(0)
+        self.StepSet=Scale(self.sm,variable=self.steps,from_=2000,to=0,width=slwidth,length=slength)
+        self.StepSet.grid(row=10,column=0,rowspan=3)                
+
+        ##Interval Button
+        self.startButton=Button(self.sm,text="Interval",fg="black",bg="cyan",height=3, width=6,command=self.interval)
+        self.startButton.grid(row=10,column=2)
+
         ##Jog Button
         self.startButton=Button(self.sm,text="JOG",fg="black",bg="green",height=3, width=6,command=self.jog)
         self.startButton.grid(row=10,column=1)
@@ -121,7 +150,7 @@ class stepperGUI:
         
         ##Stop Button
         self.stopButton=Button(self.sm,text="STOP",fg="white",bg="red",height=3, width=6,command=self.stop)
-        self.stopButton.grid(row=12,column=1)  
+        self.stopButton.grid(row=11,column=2)  
 
         ##Off Button
         self.stopButton=Button(self.sm,text="OFF",fg="black",bg="yellow",height=3, width=6,command=self.off)
@@ -142,6 +171,21 @@ class stepperGUI:
             dir='ccw'
         MOTOR.stepperCONFIG( 0,self.mVal,dir,self.ss.get(),self.rate.get(),self.acc.get())
         MOTOR.stepperJOG(0,self.mVal)
+        self.stepState=1
+        
+    def interval(self):
+        if (self.direction.get() == 0):
+            dir='cw'
+        else:
+            dir='ccw'
+        MOTOR.stepperCONFIG( 0,self.mVal,dir,self.ss.get(),self.rate.get(),self.acc.get())
+        
+        a = 1
+        while a < self.interval:
+            MOTOR.stepperMOVE(0,self.mVal,self.steps.get())
+            sleep(self.delay)
+            a = a + 1
+        
         self.stepState=1
         
     def move(self):
@@ -256,7 +300,7 @@ MOTOR.RESET(1)
 #root = Tk()
 root.config(bg="black")
 root.attributes("-fullscreen", False)
-root.minsize(width=700, height=700)
+root.minsize(width=500, height=615)
 root.title("Stepper Motor Control")
 #swidth= root.winfo_screenwidth() # remove comment for full screen
 #sheight=root.winfo_screenheight() # remove comment for full screen
@@ -266,7 +310,7 @@ container.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 
 ma_gui = stepperGUI(container,"Stepper Motor A",'a',1,1)
-mb_gui = stepperGUI(container,"Stepper Motor B",'b',1,2)
+#mb_gui = stepperGUI(container,"Stepper Motor B",'b',1,2)
 #m1_gui = dcGUI(container,"DC Motor 1",1,0,0)
 #m2_gui = dcGUI(container,"DC Motor 2",2,2,0)
 #m3_gui = dcGUI(container,"DC Motor 3",3,0,3)
