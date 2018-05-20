@@ -18,19 +18,16 @@ class titleBLOCK:
         self.tit.grid(row=r,column=c, columnspan=2,sticky=N+S+W+E)    
          
         ##Create Fonts
-        self.title = font.Font(family='Arial', size=40, weight='bold') 
+        self.title = font.Font(family='Arial', size=20, weight='bold') 
         self.heading = font.Font(family='Arial', size=14, weight='bold')       
 
         self.logo = PhotoImage(file = '3D-ppLogo.gif')
-        self.pp=Label(self.tit,image=self.logo,anchor="center").grid() 
+        self.pp=Label(self.tit,image=self.logo,anchor="center", width=5, height=5).grid() 
         
         self.labelt = Label(self.tit, text="MOTORplate Controller", bg='white',fg='#000666000',padx=4,pady=4,font=self.title,anchor="center")
         self.labelt.grid(sticky=W+E)      
         
-
-        #self.pp.bind("<ButtonRelease-1>", self.shutdown)
-        
-        self.close_button = Button(self.tit, text="X", command=root.quit).grid(sticky=E)  
+        #self.close_button = Button(self.tit, text="X", command=root.quit).grid(sticky=E)  
         
         def shutdown(self,event):
             print("clicked at") #, event.x, event.y
@@ -55,15 +52,14 @@ class stepperGUI:
         self.labelt = Label(self.sm, text=title, padx=4,pady=4, bg=smColor, fg='black',font=self.title)
         self.labelt.grid(row=0,column=0,columnspan=2,sticky=W+E)
         
-        ##Interval Rate Control
-        self.labels = Label(self.sm, text="Interval Repeat",padx=4,pady=4,font=self.heading)
-        self.labels.grid(row=1,column=2)
-        self.rate=IntVar()
-        self.rate.set(0)
-        self.RateSet=Scale(self.sm,variable=self.interval,from_=2000,to=0,width=slwidth,length=slength)
-        self.RateSet.bind("<ButtonRelease-1>", self.ratedelta)
-        self.RateSet.grid(row=2,column=2,rowspan=2)
- 
+        ##Interval Repeat Control
+        self.labelt = Label(self.sm, text="Interval Repeat",padx=4,pady=4,font=self.heading)
+        self.labelt.grid(row=1,column=2)
+        self.rpt=DoubleVar()
+        self.rpt.set(0.0)
+        self.rptSet=Scale(self.sm,variable=self.rpt,from_=100.0,to=0.0, resolution=1,width=slwidth,length=slength)
+        self.rptSet.grid(row=2,column=2,rowspan=2)
+        
         ##Step Rate Control
         self.labels = Label(self.sm, text="Step Rate",padx=4,pady=4,font=self.heading)
         self.labels.grid(row=1,column=0)
@@ -79,7 +75,7 @@ class stepperGUI:
         self.direction = IntVar()
         self.direction.set(0)
         self.cwb = Radiobutton(self.sm, text='Clockwise', variable=self.direction, value=0)
-        self.ccwb = Radiobutton(self.sm, text=' Counter Clockwise', variable=self.direction, value=1)
+        self.ccwb = Radiobutton(self.sm, text=' Cntr Clockwise', variable=self.direction, value=1)
         self.direction.set(0)
         self.cwb.grid(row=2,column=1,sticky=W)
         self.ccwb.grid(row=3,column=1,sticky=W)
@@ -181,9 +177,9 @@ class stepperGUI:
         MOTOR.stepperCONFIG( 0,self.mVal,dir,self.ss.get(),self.rate.get(),self.acc.get())
         
         a = 1
-        while a < self.interval:
+        while a < self.rptSet.get(): #10: #self.ratedelta:
             MOTOR.stepperMOVE(0,self.mVal,self.steps.get())
-            sleep(self.delay)
+            time.sleep(10) #(self.delay)
             a = a + 1
         
         self.stepState=1
@@ -205,92 +201,92 @@ class stepperGUI:
         MOTOR.stepperOFF(0,self.mVal)    
         self.stepState=0         
 
-class dcGUI:   
-    def __init__(self,master,title,mN,r,c):
-        self.dcState=0       #stopped
-        dcColor="red"
-        slwidth=30
-        self.mNum=mN
-        self.master=master
-        self.dcm=Frame(master,padx=4,pady=4,bd=2,relief='sunken')
-        self.dcm.grid(row=r,column=c, columnspan=1, rowspan=2, sticky=N+S+W+E)
-        
-        ##Font Setup
-        self.title = font.Font(family='Arial', size=25, weight='bold')       
-        self.heading = font.Font(family='Arial', size=18, weight='bold') 
-        
-        ##Title
-        self.labelt = Label(self.dcm, text=title,  padx=4,pady=4, fg="white", bg=dcColor, font=self.title)
-        self.labelt.grid(row=0,column=0,columnspan=2,sticky=W+E)
-        
-        #Speed Control
-        self.labels = Label(self.dcm, text="Speed",padx=4,pady=4,font=self.heading)
-        self.labels.grid(row=1,column=0)
-        self.speed=IntVar()
-        self.speed.set(0)
-        self.SpeedSet=Scale(self.dcm,variable=self.speed,from_=100,to=0,width=slwidth)
-        self.SpeedSet.bind("<ButtonRelease-1>", self.speeddelta)
-        self.SpeedSet.grid(row=2,column=0,rowspan=2)
-        
-        ##Direction Control
-        self.labeld = Label(self.dcm, text="Direction",padx=4,pady=4,font=self.heading)
-        self.labeld.grid(row=1,column=1,sticky=W)       
-        self.direction = IntVar()
-        self.direction.set(0)
-        self.cwb = Radiobutton(self.dcm, text='Clockwise', variable=self.direction, value=0)
-        self.ccwb = Radiobutton(self.dcm, text=' Counter Clockwise', variable=self.direction, value=1)
-        self.direction.set(0)
-        self.cwb.grid(row=2,column=1,sticky=W)
-        self.ccwb.grid(row=3,column=1,sticky=W)
-        
-        ##Acceleration Control
-        self.labela = Label(self.dcm, text="Acceleration",padx=4,pady=4,font=self.heading)
-        self.labela.grid(row=4,column=0)
-        self.acc=DoubleVar()
-        self.acc.set(0.0)
-        self.accSet=Scale(self.dcm,variable=self.acc,from_=5.0,to=0.0, resolution=0.1,length=100,width=slwidth)
-        self.accSet.grid(row=5,column=0,rowspan=2)
-        
-        ##RPM Display
-        self.rpm=StringVar()
-        self.rpm.set('0')        
-        self.labelt = Label(self.dcm, text="RPM",padx=4,pady=4,font=self.heading)
-        self.labelt.grid(row=7,column=0,columnspan=2) 
-        self.labelt = Label(self.dcm, textvariable=self.rpm ,padx=4,pady=4,font=self.heading)
-        self.labelt.grid(row=8,column=0,columnspan=2)        
-        
-        ##Start Button
-        self.startButton=Button(self.dcm,text="GO",fg="black",bg="green",height=3, width=6,command=self.go)
-        self.startButton.grid(row=5,column=1)
-        
-        ##Stop Button
-        self.stopButton=Button(self.dcm,text="STOP",fg="white",bg="red",height=3, width=6,command=self.stop)
-        self.stopButton.grid(row=6,column=1)
-        
-        self.UpdateRPM() 
-        
-    def go(self):
-        if (self.direction.get() == 0):
-            dir='cw'
-        else:
-            dir='ccw'
-        MOTOR.dcCONFIG(1,self.mNum,dir,self.speed.get(),self.acc.get())
-        MOTOR.dcSTART(1,self.mNum)
-        self.dcState=1
-        
-    def stop(self):
-        MOTOR.dcSTOP(1,self.mNum)    
-        self.dcState=0
-    
-    def speeddelta(self,val):
-        #print self.dcState,self.speed.get()
-        if (self.dcState):
-            MOTOR.dcSPEED(1,self.mNum,self.speed.get())
-        
-    def UpdateRPM(self):
-        t=MOTOR.getTACHfine(1,self.mNum)
-        self.rpm.set(str(t*60/300))
-        self.dcm.after(1000,self.UpdateRPM)    
+#class dcGUI:   
+#    def __init__(self,master,title,mN,r,c):
+#        self.dcState=0       #stopped
+#        dcColor="red"
+#        slwidth=30
+#        self.mNum=mN
+#        self.master=master
+#        self.dcm=Frame(master,padx=4,pady=4,bd=2,relief='sunken')
+#        self.dcm.grid(row=r,column=c, columnspan=1, rowspan=2, sticky=N+S+W+E)
+#        
+#        ##Font Setup
+#        self.title = font.Font(family='Arial', size=25, weight='bold')       
+#        self.heading = font.Font(family='Arial', size=18, weight='bold') 
+#        
+#        ##Title
+#        self.labelt = Label(self.dcm, text=title,  padx=4,pady=4, fg="white", bg=dcColor, font=self.title)
+#        self.labelt.grid(row=0,column=0,columnspan=2,sticky=W+E)
+#        
+#        #Speed Control
+#        self.labels = Label(self.dcm, text="Speed",padx=4,pady=4,font=self.heading)
+#        self.labels.grid(row=1,column=0)
+#        self.speed=IntVar()
+#        self.speed.set(0)
+#        self.SpeedSet=Scale(self.dcm,variable=self.speed,from_=100,to=0,width=slwidth)
+#        self.SpeedSet.bind("<ButtonRelease-1>", self.speeddelta)
+#        self.SpeedSet.grid(row=2,column=0,rowspan=2)
+#        
+#        ##Direction Control
+#        self.labeld = Label(self.dcm, text="Direction",padx=4,pady=4,font=self.heading)
+#        self.labeld.grid(row=1,column=1,sticky=W)       
+#        self.direction = IntVar()
+#        self.direction.set(0)
+#        self.cwb = Radiobutton(self.dcm, text='Clockwise', variable=self.direction, value=0)
+#        self.ccwb = Radiobutton(self.dcm, text=' Counter Clockwise', variable=self.direction, value=1)
+#        self.direction.set(0)
+#        self.cwb.grid(row=2,column=1,sticky=W)
+#        self.ccwb.grid(row=3,column=1,sticky=W)
+#        
+#        ##Acceleration Control
+#        self.labela = Label(self.dcm, text="Acceleration",padx=4,pady=4,font=self.heading)
+#        self.labela.grid(row=4,column=0)
+#        self.acc=DoubleVar()
+#        self.acc.set(0.0)
+#        self.accSet=Scale(self.dcm,variable=self.acc,from_=5.0,to=0.0, resolution=0.1,length=100,width=slwidth)
+#        self.accSet.grid(row=5,column=0,rowspan=2)
+#        
+#        ##RPM Display
+#        self.rpm=StringVar()
+#        self.rpm.set('0')        
+#        self.labelt = Label(self.dcm, text="RPM",padx=4,pady=4,font=self.heading)
+#        self.labelt.grid(row=7,column=0,columnspan=2) 
+#        self.labelt = Label(self.dcm, textvariable=self.rpm ,padx=4,pady=4,font=self.heading)
+#        self.labelt.grid(row=8,column=0,columnspan=2)        
+#        
+#        ##Start Button
+#        self.startButton=Button(self.dcm,text="GO",fg="black",bg="green",height=3, width=6,command=self.go)
+#        self.startButton.grid(row=5,column=1)
+#        
+#        ##Stop Button
+#        self.stopButton=Button(self.dcm,text="STOP",fg="white",bg="red",height=3, width=6,command=self.stop)
+#        self.stopButton.grid(row=6,column=1)
+#        
+#        self.UpdateRPM() 
+#        
+#   def go(self):
+#        if (self.direction.get() == 0):
+#            dir='cw'
+#        else:
+#            dir='ccw'
+#        MOTOR.dcCONFIG(1,self.mNum,dir,self.speed.get(),self.acc.get())
+#        MOTOR.dcSTART(1,self.mNum)
+#        self.dcState=1
+#        
+#    def stop(self):
+#        MOTOR.dcSTOP(1,self.mNum)    
+#        self.dcState=0
+#    
+#    def speeddelta(self,val):
+#        #print self.dcState,self.speed.get()
+#        if (self.dcState):
+#            MOTOR.dcSPEED(1,self.mNum,self.speed.get())
+#        
+#    def UpdateRPM(self):
+#        t=MOTOR.getTACHfine(1,self.mNum)
+#        self.rpm.set(str(t*60/300))
+#        self.dcm.after(1000,self.UpdateRPM)    
 
     
 
@@ -300,7 +296,7 @@ MOTOR.RESET(1)
 #root = Tk()
 root.config(bg="black")
 root.attributes("-fullscreen", False)
-root.minsize(width=500, height=615)
+root.minsize(width=500, height=700)
 root.title("Stepper Motor Control")
 #swidth= root.winfo_screenwidth() # remove comment for full screen
 #sheight=root.winfo_screenheight() # remove comment for full screen
@@ -309,7 +305,7 @@ container=Frame(root,bg="white")
 container.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 
-ma_gui = stepperGUI(container,"Stepper Motor A",'a',1,1)
+ma_gui = stepperGUI(container,"Photo Stepper Motor",'a',1,1)
 #mb_gui = stepperGUI(container,"Stepper Motor B",'b',1,2)
 #m1_gui = dcGUI(container,"DC Motor 1",1,0,0)
 #m2_gui = dcGUI(container,"DC Motor 2",2,2,0)
